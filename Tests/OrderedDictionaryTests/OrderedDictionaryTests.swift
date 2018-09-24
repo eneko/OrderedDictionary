@@ -8,7 +8,8 @@ final class OrderedDictionaryTests: XCTestCase {
 
         var dict = OrderedDictionary<String, String>()
         expectation.forEach {
-            dict[$0] = UUID().uuidString
+            let key = $0
+            dict[key] = UUID().uuidString
         }
 
         XCTAssertEqual(dict.orderedKeys, expectation)
@@ -19,7 +20,8 @@ final class OrderedDictionaryTests: XCTestCase {
 
         var dict = OrderedDictionary<String, String>()
         DispatchQueue.concurrentPerform(iterations: 10_000) { iteration in
-            dict["\(iteration)"] = UUID().uuidString
+            let key = expectation[iteration]
+            dict[key] = UUID().uuidString
         }
 
         XCTAssertEqual(dict.orderedKeys, expectation)
