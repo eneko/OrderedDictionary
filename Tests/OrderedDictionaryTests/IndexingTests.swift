@@ -21,14 +21,25 @@ class IndexingTests: XCTestCase {
         XCTAssertEqual(dict.count, 0)
     }
 
+    func testGetter() {
+        var dict = OrderedDictionary<String, String>()
+        dict["foo"] = "FOO"
+        dict["bar"] = "BAR"
+        dict["baz"] = nil
+        XCTAssertEqual(dict["foo"], "FOO")
+        XCTAssertEqual(dict["bar"], "BAR")
+        XCTAssertNil(dict["baz"])
+    }
+
     func testOrderConsistency() {
         var dict = OrderedDictionary<String, String>()
         dict["foo"] = "FOO"
         dict["bar"] = "BAR"
         dict["bar"] = nil
         dict["baz"] = "BAZ"
+        dict["foo"] = "JAX"
         XCTAssertEqual(dict.orderedKeys, ["foo", "baz"])
-        XCTAssertEqual(dict.orderedValues, ["FOO", "BAZ"])
+        XCTAssertEqual(dict.orderedValues, ["JAX", "BAZ"])
         dict["foo"] = nil
         dict["foo"] = "FOO"
         XCTAssertEqual(dict.orderedKeys, ["baz", "foo"])
@@ -38,6 +49,7 @@ class IndexingTests: XCTestCase {
     static var allTests = [
         ("testCount", testCount),
         ("testIsEmpty", testIsEmpty),
+        ("testGetter", testGetter),
         ("testOrderConsistency", testOrderConsistency),
     ]
 }
