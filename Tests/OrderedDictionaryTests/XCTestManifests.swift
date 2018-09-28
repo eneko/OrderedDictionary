@@ -3,7 +3,8 @@ import XCTest
 #if !os(macOS)
 public func allTests() -> [XCTestCaseEntry] {
     return [
-        testCase(OrderedDictionaryTests.allTests),
+        testCase(IndexingTests.allTests),
+        testCase(OrderedKeysTests.allTests),
     ]
 }
 #endif

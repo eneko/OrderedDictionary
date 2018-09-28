@@ -15,13 +15,34 @@ private let queue = DispatchQueue(label: "OrderedDictionarySerialQueue")
 /// Both keys and values can be read in-order of insertion. Conformance to
 /// `Sequence` protocol allows for easy iteration over keys and values.
 public struct OrderedDictionary<Key: Hashable, Value> {
-    private var store: [Key: Value] = [:]
-    private var indices: [Key: Int] = [:]
 
-    public init() {
+    var store: [Key: Value] = [:]
+    var indices: [Key: Int] = [:]
+    var nextIndex = 0
 
+    /// Initialize an empty ordered dictionary.
+    public init() {}
+
+    /// Determine if the dictionary contains any elements
+    /// - complexity: O(1)
+    public var isEmpty: Bool {
+        return store.isEmpty
     }
 
+    /// Determine the number of elements contained by the dictionary
+    /// - complexity: O(1)
+    public var count: Int {
+        return store.count
+    }
+
+    /// Get or set a value using subscripting.
+    ///
+    ///     var dict = OrderedDictionary<String, String>()
+    ///     dict["key"] = "value" // set
+    ///     dict["key"]           // get
+    ///     dict["key"] = nil     // remove
+    ///
+    /// - Parameter key: key to retrieve the value.
     public subscript(key: Key) -> Value? {
         get {
             return getValue(forKey: key)
@@ -35,10 +56,14 @@ public struct OrderedDictionary<Key: Hashable, Value> {
         }
     }
 
-    private func getValue(forKey key: Key) -> Value? {
+    /// Retrieve a value from the dictionary under the given key.
+    ///
+    /// - Parameter key: Key to be used to retrieve the value.
+    /// - Returns: Value if the dictionary contained that key.
+    func getValue(forKey key: Key) -> Value? {
         var value: Value?
         queue.sync {
-            value = self.store[key]
+            value = store[key]
         }
         return value
     }
@@ -46,55 +71,50 @@ public struct OrderedDictionary<Key: Hashable, Value> {
     /// Store a value in the dictionary under the given key.
     ///
     /// - Parameters:
-    ///   - value: Value to be stored
-    ///   - key: Key to be used to retrieve the value
+    ///   - value: Value to be stored.
+    ///   - key: Key to be used to retrieve the value.
     /// - Complexity: O(n)
-    private mutating func set(value: Value, forKey key: Key) {
+    mutating func set(value: Value, forKey key: Key) {
         queue.sync {
-            if let _ = self.indices[key] {
+            if let _ = indices[key] {
                 // Already in dictionary, keep current index
             } else {
-                self.indices[key] = self.indices.keys.count
+                indices[key] = nextIndex
+                nextIndex += 1
             }
             store[key] = value
         }
     }
 
-    private mutating func remove(key: Key) {
+    /// Remove an element stored in the dictionary under the given key.
+    ///
+    /// - Parameter key: Key where the element is stored under.
+    mutating func remove(key: Key) {
         queue.sync {
-            self.indices[key] = nil
-            self.store[key] = nil
-            self.reindex()
+            indices[key] = nil
+            store[key] = nil
+            reindex()
         }
     }
 
     private mutating func reindex() {
-        queue.sync {
-            let sortedIndices = indices.sorted(by: { $0.value < $1.value })
-            sortedIndices.enumerated().forEach { (offset, pair) in
-                self.indices[pair.key] = offset
-            }
+        guard nextIndex - count > reindexThreshold else {
+            return
         }
+
+        for (offset, index) in orderedIndices.enumerated() {
+            indices[index.key] = offset
+        }
+        nextIndex = count
     }
 
+    private let reindexThreshold = 1024 * 1024
 }
 
 extension OrderedDictionary {
 
-    /// Collection of key/value pairs sorted by insertion order.
-    public var orderedKeyValuePairs: [(key: Key, value: Value)] {
-        var result: [(key: Key, value: Value)] = []
-        queue.sync {
-            let sortedIndices = indices.sorted(by: { $0.value < $1.value })
-            result = sortedIndices.compactMap { (key, _) in
-                let value = store[key]
-                return value.flatMap { (key: key, value: $0) }
-            }
-//            for index in sortedIndices let value = store[index.value] {
-//
-//            }
-        }
-        return result
+    private var orderedIndices: [(key: Key, value: Int)] {
+        return indices.sorted(by: { $0.value < $1.value })
     }
 
     /// Collection of keys sorted by insertion order.
@@ -111,7 +131,16 @@ extension OrderedDictionary {
         return orderedKeyValuePairs.map { $0.value }
     }
 
-    private var orderedIndices: [(key: Key, value: Int)] {
-        return indices.sorted(by: { $0.value < $1.value })
+    /// Collection of key/value pairs sorted by insertion order.
+    public var orderedKeyValuePairs: [(key: Key, value: Value)] {
+        var result: [(key: Key, value: Value)] = []
+        queue.sync {
+            result = orderedIndices.compactMap { (key, _) in
+                let value = store[key]
+                return value.flatMap { (key: key, value: $0) }
+            }
+        }
+        return result
     }
+
 }
