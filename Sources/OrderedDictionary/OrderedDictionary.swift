@@ -1,4 +1,5 @@
 import Foundation
+import Dispatch
 
 private let queue = DispatchQueue(label: "OrderedDictionarySerialQueue")
 
