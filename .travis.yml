@@ -3,14 +3,14 @@ language: generic
 jobs:
   include:
     - stage: Test
-      name: Linux SwiftPM 4.0
+      name: Linux SwiftPM 4.1
       os: linux
       dist: trusty
       sudo: required
       install:
       - eval "$(curl -sL https://swiftenv.fuller.li/install.sh)"
-      - swiftenv install 4.0
-      - swiftenv local 4.0
+      - swiftenv install 4.1
+      - swiftenv local 4.1
       - swift --version
       script:
       - swift test
