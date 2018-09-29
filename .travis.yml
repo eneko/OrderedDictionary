@@ -28,7 +28,7 @@ jobs:
       osx_image: xcode9.3
       script:
       - swift package generate-xcodeproj --enable-code-coverage
-      - xcodebuild -scheme OrderedMarkdownGenerator-Package test
+      - xcodebuild -scheme OrderedDictionary-Package test
       after_success:
       - bash <(curl -s https://codecov.io/bash);
 
