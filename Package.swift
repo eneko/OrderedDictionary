@@ -7,7 +7,7 @@ let package = Package(
     products: [
         .library(
             name: "OrderedDictionary",
-            targets: ["OrderedDictionary"]),
+            targets: ["OrderedDictionary"])
     ],
     dependencies: [
     ],
@@ -17,6 +17,6 @@ let package = Package(
             dependencies: []),
         .testTarget(
             name: "OrderedDictionaryTests",
-            dependencies: ["OrderedDictionary"]),
+            dependencies: ["OrderedDictionary"])
     ]
 )

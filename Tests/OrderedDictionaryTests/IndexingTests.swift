@@ -50,6 +50,6 @@ class IndexingTests: XCTestCase {
         ("testCount", testCount),
         ("testIsEmpty", testIsEmpty),
         ("testGetter", testGetter),
-        ("testOrderConsistency", testOrderConsistency),
+        ("testOrderConsistency", testOrderConsistency)
     ]
 }

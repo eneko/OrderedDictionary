@@ -116,6 +116,6 @@ final class OrderedKeysTests: XCTestCase {
         ("testOrderedKeysAsync", testOrderedKeysAsync),
         ("testOrderedKeysSetTwice", testOrderedKeysSetTwice),
         ("testOrderedKeysSetAndClear", testOrderedKeysSetAndClear),
-        ("testOrderedKeysSetThenClear", testOrderedKeysSetThenClear),
+        ("testOrderedKeysSetThenClear", testOrderedKeysSetThenClear)
     ]
 }

@@ -7,6 +7,7 @@ build:
 	swift build --disable-sandbox -c release -Xswiftc -static-stdlib
 
 test:
+	swift test
 	swift test --parallel
 
 xcode:
